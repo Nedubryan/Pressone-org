@@ -1,81 +1,34 @@
-# Pressone-org
-QA Engineer Take-Home Assessment
-# Todo App (Pressone-org)
+# End-to-End Test Notes
 
-A simple Vue.js-based Todo app with unit tests using Vitest.
+## Handling Flakiness
 
-#  Overview
+To avoid flakiness:
 
-This project allows users to:
+- We use `await page.waitForURL()` and `expect().toContainText()` to assert only after elements are stable.
+- Added retry-ability via Playwright’s built-in auto-wait and assertions.
+- Avoided hardcoded `waitForTimeout()` delays.
+- Test runs in `test.describe()` scope to isolate context.
 
---Add new todos  
---Delete existing todos  
---Filter todos (All / Short / Long)  
---Handle empty or duplicate todos gracefully
+## Reporting Failures
 
-##  Tech Stack
+- Use Playwright's built-in HTML reporter:  
+  Run with: `npx playwright test --reporter=html`
+- For CI, failed tests will show up with trace + video if configured:
+  bash
+  npx playwright test --trace=on --video=on
 
-- **Vue 3**: Composition API  
-- **Vite**: Build tool  
-- **Vitest**: Unit testing framework  
-- **@vue/test-utils**: Vue testing utilities
+## CI Integration
+This test is CI-ready:
 
-##  Project Setup
+- Run npx playwright install during setup
 
-1. Clone the repo:
+- Add npx playwright test to your CI pipeline 
 
-bash
-git clone https://github.com/your-username/pressone-org.git
-cd pressone-org
+- Use artifacts (HTML reports, videos, traces) for post-failure debugging
 
-2. Install dependencies:
-   npm install
-   
-3. Start the development server:
-   npm run dev
-
-4. Run unit tests:
-   npx vitest
-
-##  Tests
-The tests are located in:
---tests/unit/Todo.spec.js
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+Example:
+name: Run Playwright tests
+  run: |
+    npm ci
+    npx playwright install
+    npx playwright test
